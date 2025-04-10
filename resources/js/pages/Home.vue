@@ -58,9 +58,9 @@ defineProps({
 })
 
 const form = useForm({
-    playlist_name: '',
-    playlist_link: '',
-    platform: ''
+    playlist_name: 'Soul',
+    playlist_link: 'https://music.apple.com/za/playlist/for-the-soul/pl.u-aZb0N67uPVBP0k4',
+    platform: 'apple'
 })
 
 const disabled = computed(() => !form.playlist_link || !form.platform)

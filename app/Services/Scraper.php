@@ -7,8 +7,7 @@ class Scraper
 {
     public static function scrape(string $url, string $look_for, string $wait_for): array
     {
-        putenv('PATH=' . getenv('PATH') . ':' . $_SERVER['HOME'] . '/.cache/bdi/chromedriver');
-        $client = Client::createChromeClient();
+        $client = Client::createChromeClient(__DIR__.'/../../drivers/chromedriver');
 
         try {
             $client->request('GET', $url);

@@ -18,7 +18,7 @@ class AppleMusicService implements PlatfromInterface
             $tracks = [];
             foreach ($data as $item) {
                 $track = explode("\n", trim($item));
-                $data[] = [
+                $tracks[] = [
                     'name' => $track[0],
                     'artist' => $track[1],
                     'duration' => $track[2],
@@ -28,7 +28,7 @@ class AppleMusicService implements PlatfromInterface
             throw (new Exception($e->getMessage()));
         }
 
-        return $data;
+        return $tracks;
     }
 
 

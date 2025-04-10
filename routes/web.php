@@ -1,8 +1,10 @@
 <?php
 
 use App\Jobs\CreatePlaylist;
+use App\Models\User;
 use App\Services\Platforms\SpotifyService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -27,7 +29,7 @@ Route::get('/', function () {
     return Inertia::render('Home', [
         'platforms' => $platforms
     ]);
-})->name('home');
+})->name('home')->middleware('auth');
 
 Route::post('convert', function (Request $request) {
     $request->validate([
@@ -37,12 +39,12 @@ Route::post('convert', function (Request $request) {
     ]);
     $code = session('code');
     session()->forget('code');
-   CreatePlaylist::dispatch($request->input('playlist_name'), $request->input('playlist_link'), $request->input('platform'), $code);
+   CreatePlaylist::dispatch($request->input('playlist_name'), $request->input('playlist_link'), $request->input('platform'), $code, Auth::user());
 })->name('convert');
 
 Route::get('/spotify_auth', function (){
     $state = Str::random();
-    $scope = 'user-read-private user-read-email';
+    $scope = 'user-read-private user-read-email playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public';
     $client_id = config('services.spotify.client_id');
     $redirect_uri = config('services.spotify.redirect_url');
 
@@ -53,4 +55,30 @@ Route::get('/spotify_redirect', function (Request $request) {
     session()->put('code', $request->get('code'));
 
     return redirect()->route('home');
+});
+
+Route::get('/auth/login', function () {
+    return Inertia::render('Login');
+})->name('login');
+
+Route::get('/auth/register', function () {
+    return Inertia::render('Register');
+})->name('register');
+
+Route::post('/auth/register', function (Request $request) {
+    $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+        'password' => ['required', 'string', 'min:8', 'confirmed'],
+    ]);
+
+    $user = User::query()->create($request->all());
+    Auth::login($user);
+
+    return redirect()->route('home');
+});
+
+Route::post('/auth/login', function (Request $request) {
+    $user = Auth::attempt($request->only('email', 'password'));
+    return redirect()->intended();
 });

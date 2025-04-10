@@ -11,10 +11,6 @@ class SpotifyService implements PlatfromInterface
     public string $auth_access_token = '';
     public string $user_id = '';
 
-    public function __construct(public string $code = '')
-    {
-    }
-
     private function setAccessToken(): void
     {
         try {
@@ -34,7 +30,8 @@ class SpotifyService implements PlatfromInterface
         }
     }
 
-    private function setAuthAccessToken(): void {
+    public static function createAuthAccessToken(string $auth_code) {
+        $data = null;
         try {
             $request = Http::asForm()
                 ->withHeaders([
@@ -42,7 +39,7 @@ class SpotifyService implements PlatfromInterface
                 ])
                 ->post("https://accounts.spotify.com/api/token", [
                     "grant_type"    => "authorization_code",
-                    "code"          => $this->code,
+                    "code"          => $auth_code,
                     "redirect_uri"  => config('services.spotify.redirect_url'),
                 ]);
 
@@ -50,9 +47,36 @@ class SpotifyService implements PlatfromInterface
             if (!$request->successful()) {
                 throw new ConnectionException();
             }
-            $this->auth_access_token = $request->json()['access_token'];
+
+            $data = $request->json();
         } catch (ConnectionException $e) {
         }
+
+        return $data;
+    }
+
+    public static function refreshToken(string $refresh_token) {
+        $data = null;
+        try {
+            $request = Http::asForm()
+                ->withHeaders([
+                    'Authorization' => "Basic ". base64_encode(config('services.spotify.client_id').':'.config('services.spotify.client_secret')),
+                ])
+                ->post("https://accounts.spotify.com/api/token", [
+                    "grant_type"    => "refresh_token",
+                    "refresh_token" => $refresh_token,
+                    "client_id"     => config('services.spotify.client_id'),
+            ]);
+
+            if (!$request->successful()) {
+                throw new ConnectionException();
+            }
+
+            $data = $request->json();
+        } catch (ConnectionException $e) {
+        }
+
+        return $data;
     }
 
     public static function getTracks(string $url): array
@@ -77,15 +101,103 @@ class SpotifyService implements PlatfromInterface
     /**
      * @throws ConnectionException
      */
-    private function me()
+    public static function me(string $access_token)
     {
-        $response = Http::withToken($this->auth_access_token)->get("https://api.spotify.com/v1/me");
-        $this->user_id = $response->json()['id'];
+        $data = null;
+        try {
+            $response = Http::withToken($access_token)->get("https://api.spotify.com/v1/me");
+
+            if (!$response->successful()) {
+                throw new ConnectionException();
+            }
+
+            $data = $response->json();
+        } catch (\Exception $e) {
+
+        }
+
+        return $data;
+    }
+
+    public static function createPlaylist(string $name, string $access_token, $user_id)
+    {
+        $data = null;
+        try {
+            $response = Http::withToken($access_token)->post("https://api.spotify.com/v1/users/" . $user_id . "/playlists", [
+                'name' => $name,
+                'description' => $name,
+                'public' => true
+            ]);
+
+            if (!$response->successful()) {
+                info($response->body());
+                throw new ConnectionException();
+            }
+
+            $data = $response->json();
+        }
+        catch (\Exception $e) {
+        }
+
+        return $data;
+    }
+
+    public static function search(string $access_token, string $query, string $types)
+    {
+        $data = null;
+        try {
+            $response = Http::withToken($access_token)->get("https://api.spotify.com/v1/search", [
+                'q' => $query,
+                'type' => $types,
+                'limit' => 50
+            ]);
+
+            if (!$response->successful()) {
+                dd($response->body());
+                throw new ConnectionException();
+            }
+            $data = $response->json();
+        }
+        catch (\Exception $e) {}
+
+        return $data;
     }
 
     public function makePlaylist(string $name, array $tracks): void
     {
-        $this->setAuthAccessToken();
+        $this->createAuthAccessToken();
         $this->me();
+
+        // create playlist
+//        $playlist = $this->createPlaylist($name);
+
+        $add_count = 0;
+        // loop through songs
+        foreach ($tracks as $track) {
+            // search for song on Spotify
+            $query = 'track%3A' . $track['name'] . ' artist%3A' . $track['artist'];
+            $result = $this->search($query, 'track');
+
+
+            foreach ($result['tracks']['items'] as $item) {
+                if ($item['type'] !== 'track') {
+                    continue;
+                }
+                $same_artist = false;
+                $similar_name = fnmatch($track['name'], $item['name']);
+                foreach ($item['artists'] as $artist) {
+                    if ($artist['name'] == $track['artist']) {
+                        $same_artist = true;
+                    }
+                }
+                if($same_artist && $similar_name) {
+                    $add_count++;
+                }
+            }
+            // add song to the playlist
+        }
+
+        info(count($tracks) . " - " . $add_count . " songs added");
+        dd();
     }
 }
