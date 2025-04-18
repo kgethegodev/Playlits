@@ -2,6 +2,8 @@
 node_modules/
 npm-debug.log
 yarn-error.log
+database.sqlite
+database.sqlite-journal
 
 # Laravel 4 specific
 bootstrap/compiled.php
