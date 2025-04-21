@@ -20,7 +20,7 @@ const submit = () => {
 </script>
 
 <template>
-    <div class="min-h-[100vh] flex flex-col items-center justify-center px-4 sm:px-0">
+    <div class="min-h-[100dvh] flex flex-col items-center justify-center px-4 sm:px-0">
         <div class="flex flex-col w-full max-w-lg gap-[1rem]">
             <h1 class="text-2xl font-black">Register</h1>
             <form class="flex flex-col gap-6" @submit.prevent="submit">

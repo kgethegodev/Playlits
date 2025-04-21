@@ -10,7 +10,7 @@ const pending_playlists = computed(() => props.playlists.some(playlist => playli
 </script>
 
 <template>
-    <div class="min-h-[100vh] flex flex-col justify-between py-2 gap-4">
+    <div class="min-h-[100dvh] flex flex-col justify-between py-2 gap-4">
         <header>
             <div class="max-w-lg mx-auto flex items-center justify-between px-4 sm:px-0">
                 <Link class="text-xl font-bold" href="/">playlits.</Link>
