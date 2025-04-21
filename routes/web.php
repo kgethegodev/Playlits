@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PlaylistController;
 use App\Jobs\CreatePlaylist;
 use App\Models\User;
 use App\Services\Platforms\SpotifyService;
@@ -9,38 +10,13 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    if(!session('code'))
-        return redirect()->route('spotify_auth');
-    $platforms = [
-        [
-            'name'  => 'Apple Music',
-            'value' => 'apple'
-        ],
-        [
-            'name'  => 'Spotify',
-            'value' => 'spotify'
-        ],
-        [
-            'name'  => 'Youtube Music',
-            'value' => 'youtube'
-        ]
-    ];
-    return Inertia::render('Home', [
-        'platforms' => $platforms
-    ]);
-})->name('home')->middleware('auth');
+Route::get('/', [PlaylistController::class, 'index'])->name('home')->middleware('auth');
 
-Route::post('convert', function (Request $request) {
-    $request->validate([
-        'playlist_name' => ['required', 'string', 'max:255'],
-        'playlist_link' => ['required', 'url', 'active_url'],
-        'platform' => ['required', 'string', 'in:apple,spotify,youtube'],
-    ]);
-    $code = session('code');
-    session()->forget('code');
-   CreatePlaylist::dispatch($request->input('playlist_name'), $request->input('playlist_link'), $request->input('platform'), $code, Auth::user());
-})->name('convert');
+Route::get('/playlists', [PlaylistController::class, 'playlists'])->name('playlists')->middleware('auth');
+
+Route::get('/playlists/{playlist}', [PlaylistController::class, 'playlist'])->name('playlist')->middleware('auth');
+
+Route::post('convert', [PlaylistController::class, 'convert'])->name('convert');
 
 Route::get('/spotify_auth', function (){
     $state = Str::random();
@@ -61,6 +37,15 @@ Route::get('/auth/login', function () {
     return Inertia::render('Login');
 })->name('login');
 
+Route::post('/auth/login', function (Request $request) {
+    $request->validate([
+        'email' => ['required', 'string', 'email', 'max:255', 'exists:users'],
+        'password' => ['required', 'string', 'min:8'],
+    ]);
+
+    $user = Auth::attempt($request->only('email', 'password'));
+});
+
 Route::get('/auth/register', function () {
     return Inertia::render('Register');
 })->name('register');
@@ -74,11 +59,4 @@ Route::post('/auth/register', function (Request $request) {
 
     $user = User::query()->create($request->all());
     Auth::login($user);
-
-    return redirect()->route('home');
-});
-
-Route::post('/auth/login', function (Request $request) {
-    $user = Auth::attempt($request->only('email', 'password'));
-    return redirect()->intended();
 });

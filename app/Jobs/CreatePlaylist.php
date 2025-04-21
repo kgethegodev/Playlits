@@ -28,15 +28,22 @@ class CreatePlaylist implements ShouldQueue
      */
     public function handle(): void
     {
+        $playlist = $this->user->playlists()->create([
+            'name' => $this->name,
+        ]);
+
         $tracks = match ($this->platform) {
             'apple' => AppleMusicService::getTracks($this->url),
             'spotify' => SpotifyService::getTracks($this->url),
         };
 
-        $playlist = $this->user->playlists()->create([
-            'name' => $this->name,
-            'tracks' => $tracks,
-        ]);
+        foreach ($tracks as $track) {
+            $playlist->tracks()->create([
+                'name' => $track['name'],
+                'artist' => $track['artist'],
+                'duration' => $track['duration'],
+            ]);
+        }
 
         $access_token = $this->user->spotifyAccessToken ?? null;
         if (!$access_token) {
@@ -46,11 +53,10 @@ class CreatePlaylist implements ShouldQueue
                 'refresh_token' => $token['refresh_token'],
                 'expires_at'    => now()->addMinutes($token['expires_in']),
             ]);
-        } elseif ($access_token->isExpired()) {
+        } else {
             $token = SpotifyService::refreshToken($access_token->refresh_token);
-            $access_token = $this->user->spotifyAccessToken()->update([
+            $access_token->update([
                 'token'  => $token['access_token'],
-                'refresh_token' => $token['refresh_token'],
                 'expires_at'    => now()->addMinutes($token['expires_in']),
             ]);
         }
@@ -68,11 +74,9 @@ class CreatePlaylist implements ShouldQueue
 
         $playlist->update([
             'spotify_playlist_id'   => $spotify_playlist['id'],
-            'spotify_link'          => $spotify_playlist['uri'],
+            'spotify_link'          => $spotify_playlist['external_urls']['spotify'],
         ]);
 
-        foreach ($tracks as $track) {
-
-        }
+        UpdateTracks::dispatch($playlist);
     }
 }

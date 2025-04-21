@@ -1,6 +1,7 @@
 <?php
 
 use App\Services\Platforms\SpotifyService;
+use App\Services\Scraper;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
@@ -13,14 +14,7 @@ Artisan::command('inspire', function () {
 
 Artisan::command("scrape", function () {
     $user = \App\Models\User::query()->first();
-    $access_token = $user->spotifyAccessToken;
-    $token = SpotifyService::refreshToken($access_token->refresh_token);
-    $access_token = $user->spotifyAccessToken()->update([
-        'token'  => $token['access_token'],
-        'expires_at'    => now()->addMinutes($token['expires_in']),
-    ]);
-
-    $playlist = \App\Models\Playlist::query()->first();
-
-    \App\Jobs\UpdateTracks::dispatch($user, $playlist);
+    $access_token = $user->spotifyAccessToken->token;
+    $track = \App\Models\PlaylistTrack::query()->findOrFail(1947);
+    \App\Jobs\FindTrack::dispatch($access_token, $track);
 });

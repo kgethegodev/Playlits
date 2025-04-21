@@ -3,89 +3,43 @@
 namespace App\Jobs;
 
 use App\Models\Playlist;
-use App\Models\User;
-use App\Services\Platforms\SpotifyService;
+use Illuminate\Bus\Batch;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Bus;
 
 class UpdateTracks implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public User $user, public Playlist $playlist)
+    public function __construct(public Playlist $playlist)
     {
         //
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function handle(): void
     {
+        $user = $this->playlist->user;
         $tracks = $this->playlist->tracks;
-        $count = 0;
 
-        foreach ($tracks as &$track) {
-            $trackName = $this->normalizeString($track['name']);
-            $trackArtist = $this->normalizeString($track['artist']);
-
-            $query = rawurlencode("{$trackName} {$trackArtist}");
-            $accessToken = $this->user->spotifyAccessToken->token;
-
-            $result = SpotifyService::search($accessToken, $query, 'track');
-
-            if ($this->matchAndAssignUri($track, $result, $trackName, $trackArtist)) {
-                $count++;
-                continue;
-            }
-
-            // Fallback: Try using only track name
-            $fallbackQuery = rawurlencode($trackName);
-            $fallbackResult = SpotifyService::search($accessToken, $fallbackQuery, 'track');
-
-            if ($this->matchAndAssignUri($track, $fallbackResult, $trackName, $trackArtist)) {
-                $count++;
-                continue;
-            }
-
-            Log::info("No match for track", [
-                'track' => $track['name'],
-                'artist' => $track['artist']
-            ]);
+        $jobs = [] ;
+        foreach ($tracks as $track) {
+            $jobs[] = new FindTrack($user->spotifyAccessToken->token, $track);
         }
 
-        dump("Matched {$count} out of " . count($tracks));
-    }
+        $playlist = $this->playlist;
 
-    private function normalizeString(string $str): string
-    {
-        $str = strtolower($str);
-        $str = preg_replace('/\s*\([^)]*\)/', '', $str); // remove (anything)
-        $str = preg_replace('/\s*\[[^\]]*\]/', '', $str); // remove [anything]
-        $str = preg_replace('/\s*\{[^}]*\}/', '', $str); // remove {anything}
-        $str = preg_replace('/feat\..*/i', '', $str); // remove feat.
-        return trim($str);
-    }
+        Bus::batch($jobs)
+            ->then(function () use ($playlist) {
+                AddSongsToPlaylist::dispatch($playlist);
+            })
+            ->dispatch();
 
-    private function matchAndAssignUri(array &$track, array $result, string $trackName, string $trackArtist): bool
-    {
-        foreach ($result['tracks']['items'] ?? [] as $item) {
-            if ($item['type'] !== 'track') continue;
-
-            $itemName = $this->normalizeString($item['name']);
-            $itemArtists = array_map(fn($a) => $this->normalizeString($a['name']), $item['artists']);
-
-            similar_text($trackName, $itemName, $percent);
-            $artistMatch = in_array($trackArtist, $itemArtists);
-
-            if ($artistMatch && $percent > 70) {
-                $track['uri'] = $item['uri'];
-                Log::info("✅ Matched '{$track['name']}' by '{$track['artist']}' to '{$item['name']}'", [
-                    'uri' => $item['uri'],
-                    'match_percent' => $percent
-                ]);
-                return true;
-            }
-        }
-
-        return false;
+        $this->playlist->update([
+            'status' => 'tracks_dispatched'
+        ]);
     }
 }

@@ -84,6 +84,27 @@ class SpotifyService implements PlatfromInterface
         return  [];
     }
 
+    public static function addTracks(string $access_token, string $playlist_id, array $uri_array)
+    {
+        $data = null;
+        try {
+            $response = Http::withToken($access_token)->post("https://api.spotify.com/v1/playlists/{$playlist_id}/tracks", [
+                'uris' => $uri_array,
+            ]);
+
+            if (!$response->successful()) {
+                info($response->body());
+                throw new ConnectionException();
+            }
+
+            $data = $response->json();
+        }
+        catch (\Exception $e) {
+        }
+
+        return $data;
+    }
+
     public function getArtist()
     {
         if (!Cache::has('spotify_access_token')) {
@@ -144,7 +165,7 @@ class SpotifyService implements PlatfromInterface
 
     public static function search(string $access_token, string $query, string $types)
     {
-        $data = null;
+        $data = [];
         try {
             $response = Http::withToken($access_token)->get("https://api.spotify.com/v1/search", [
                 'q' => $query,
@@ -153,10 +174,10 @@ class SpotifyService implements PlatfromInterface
             ]);
 
             if (!$response->successful()) {
-                dd($response->body());
                 throw new ConnectionException();
             }
-            $data = $response->json();
+
+            $data = $response->json()['tracks']['items'];
         }
         catch (\Exception $e) {}
 
@@ -196,8 +217,5 @@ class SpotifyService implements PlatfromInterface
             }
             // add song to the playlist
         }
-
-        info(count($tracks) . " - " . $add_count . " songs added");
-        dd();
     }
 }

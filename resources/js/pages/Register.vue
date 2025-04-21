@@ -2,7 +2,7 @@
 import {Button} from "@/components/ui/button/index.js";
 import {Label} from "@/components/ui/label/index.js";
 import {Input} from "@/components/ui/input/index.js";
-import {useForm} from "@inertiajs/vue3";
+import {Link, useForm} from "@inertiajs/vue3";
 
 const form = useForm({
     name: '',
@@ -11,7 +11,11 @@ const form = useForm({
     password_confirmation: ''
 });
 const submit = () => {
-    form.post('/auth/register')
+    form.post('/auth/register', {
+        onSuccess: () => {
+            window.location.href = '/spotify_auth';
+        }
+    })
 }
 </script>
 
@@ -43,7 +47,10 @@ const submit = () => {
                     <Input id="password_confirmation" v-model="form.password_confirmation" type="password" placeholder="Enter password."/>
                     <p class="text-red-500 text-sm pl-1" v-if="form.errors.password_confirmation">{{form.errors.password_confirmation}}</p>
                 </div>
-                <Button :disabled>Register</Button>
+                <div class="w-full">
+                    <Button :disabled class="w-full">Register</Button>
+                    <p class="text-sm text-center font-medium mt-2">Welcome back! <Link href="/auth/register" class="italic text-blue-600">Sign in to your account</Link>.</p>
+                </div>
             </form>
         </div>
     </div>
