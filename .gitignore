@@ -13,7 +13,6 @@ app/storage/
 public/storage
 public/hot
 /public/build/
-/public/build/*
 /drivers/
 
 # Laravel 5 & Lumen specific with changed public path
