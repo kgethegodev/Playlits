@@ -30,7 +30,8 @@ class Scraper
             });
 
         } catch (\Exception $e) {
-            Log::error("Error: " . $e->getMessage());
+            Log::error("Scraper error: " . $e->getMessage());
+            throw new \RuntimeException("Failed to scrape $url", 0, $e);
         } finally {
             $client->quit();
         }
