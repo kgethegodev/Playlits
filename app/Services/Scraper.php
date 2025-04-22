@@ -11,7 +11,7 @@ class Scraper
         $client = Client::createChromeClient(__DIR__.'/../../drivers/chromedriver', [
             '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
         ]);
-
+        $data = [];
         try {
             $client->request('GET', $url);
 
@@ -23,14 +23,13 @@ class Scraper
             if ($crawler->filter($look_for)->count() === 0) {
                 throw new \Exception('No elements found for query: ' . $look_for);
             }
-            $data = [];
+
             $crawler->filter($look_for)->each(function ($node) use (&$data) {
                 $data[] = trim($node->text());
             });
 
         } catch (\Exception $e) {
             Log::error("Error: " . $e->getMessage());
-            $data = [];
         } finally {
             $client->quit();
         }
