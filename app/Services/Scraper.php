@@ -34,6 +34,7 @@ class Scraper
             }
 
             $crawler->filter($look_for)->each(function ($node) use (&$data) {
+                info($node->text());
                 $data[] = trim($node->text());
             });
 
