@@ -8,7 +8,12 @@ class Scraper
 {
     public static function scrape(string $url, string $look_for, string $wait_for): array
     {
-        $client = Client::createChromeClient(__DIR__.'/../../drivers/chromedriver');
+        $client = Client::createChromeClient(null, [
+            '--headless',
+            '--disable-gpu',
+            '--no-sandbox',
+            '--disable-dev-shm-usage'
+        ]);
         $data = [];
         try {
             $client->request('GET', $url);
