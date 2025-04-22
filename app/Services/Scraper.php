@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Panther\Client;
 
 class Scraper
@@ -28,8 +29,8 @@ class Scraper
             });
 
         } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage();
-            $data = null;
+            Log::error("Error: " . $e->getMessage());
+            $data = [];
         } finally {
             $client->quit();
         }
