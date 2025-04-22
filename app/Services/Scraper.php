@@ -12,7 +12,13 @@ class Scraper
             '--headless',
             '--disable-gpu',
             '--no-sandbox',
-            '--disable-dev-shm-usage'
+            '--disable-dev-shm-usage',
+            '--remote-debugging-port=9222',  // Add this
+            '--disable-extensions',          // Add this
+            '--disable-setuid-sandbox',      // Add this
+            '--no-first-run',                // Add this
+            '--no-zygote',                   // Add this
+            '--single-process'               // Add this - important for some environments
         ]);
         $data = [];
         try {
