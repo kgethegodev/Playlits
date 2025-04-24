@@ -34,28 +34,26 @@ class AddSongsToPlaylist implements ShouldQueue
                 'expires_at' => now()->addMinutes($token['expires_in']),
             ]);
         }
-            $tracks = $this->playlist->tracks;
-            $uri = [];
-            foreach ($tracks as $track) {
-                if($track->external_id) {
-                    $uri[] = $track->external_id;
-                }
+        $tracks = $this->playlist->tracks;
+        $uri = [];
+        foreach ($tracks as $track) {
+            if($track->external_id) {
+                $uri[] = $track->external_id;
             }
+        }
 
-            try {
+        try {
+            if (config('app.env') === 'production') {
                 foreach (array_chunk($uri, 100) as $chunk) {
                     SpotifyService::addTracks($access_token->token, $this->playlist->spotify_playlist_id, $chunk);
                 }
-
-                 $this->playlist->update([
-                     'status' => 'complete'
-                 ]);
-            } catch (\Exception $e) {
-                Log::info("Playlist {$this->playlist->id} failed");
-                Log::error($e->getMessage());
             }
-
-
-
+             $this->playlist->update([
+                 'status' => 'complete'
+             ]);
+        } catch (\Exception $e) {
+            Log::info("Playlist {$this->playlist->id} failed");
+            Log::error($e->getMessage());
+        }
     }
 }

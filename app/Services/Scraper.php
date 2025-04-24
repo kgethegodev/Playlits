@@ -8,18 +8,23 @@ class Scraper
 {
     public static function scrape(string $url, string $look_for, string $wait_for): array
     {
-        $client = Client::createChromeClient(null, [
-            '--headless',
-            '--disable-gpu',
-            '--no-sandbox',
-            '--disable-dev-shm-usage',
-            '--remote-debugging-port=9222',  // Add this
-            '--disable-extensions',          // Add this
-            '--disable-setuid-sandbox',      // Add this
-            '--no-first-run',                // Add this
-            '--no-zygote',                   // Add this
-            '--single-process'               // Add this - important for some environments
-        ]);
+        $client =
+            config('app.env') == 'production' ?
+            Client::createChromeClient(null, [
+                '--headless',
+                '--disable-gpu',
+                '--no-sandbox',
+                '--disable-dev-shm-usage',
+                '--remote-debugging-port=9222',  // Add this
+                '--disable-extensions',          // Add this
+                '--disable-setuid-sandbox',      // Add this
+                '--no-first-run',                // Add this
+                '--no-zygote',                   // Add this
+                '--single-process'
+            ]) :
+            Client::createChromeClient(__DIR__.'/../../drivers/chromedriver', [
+                '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+            ]);
         $data = [];
         try {
             $client->request('GET', $url);

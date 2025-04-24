@@ -72,12 +72,14 @@ class CreatePlaylist implements ShouldQueue
             $spotify_user_id = $spotify_user['id'];
         }
 
-        $spotify_playlist = SpotifyService::createPlaylist($this->name, $access_token->token, $spotify_user_id);
+        if (config('app.env') === 'production') {
+            $spotify_playlist = SpotifyService::createPlaylist($this->name, $access_token->token, $spotify_user_id);
 
-        $playlist->update([
-            'spotify_playlist_id'   => $spotify_playlist['id'],
-            'spotify_link'          => $spotify_playlist['external_urls']['spotify'],
-        ]);
+            $playlist->update([
+                'spotify_playlist_id'   => $spotify_playlist['id'],
+                'spotify_link'          => $spotify_playlist['external_urls']['spotify'],
+            ]);
+        }
 
         UpdateTracks::dispatch($playlist);
     }

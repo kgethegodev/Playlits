@@ -44,7 +44,7 @@ class FindTrack implements ShouldQueue
         $this->matchAndAssignUri($this->track, $fallback_result, $track_name, $track_artist);
     }
 
-    private function normalizeString(string $str): string
+    public static function normalizeString(string $str): string
     {
         $str = strtolower($str);
         $str = preg_replace('/\s*\([^)]*\)/', '', $str); // remove (anything)
