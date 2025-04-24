@@ -2,11 +2,13 @@
 
 namespace App\Jobs;
 
+use App\Mail\PlaylistReadyMail;
 use App\Models\Playlist;
 use App\Services\Platforms\SpotifyService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AddSongsToPlaylist implements ShouldQueue
 {
@@ -51,6 +53,9 @@ class AddSongsToPlaylist implements ShouldQueue
              $this->playlist->update([
                  'status' => 'complete'
              ]);
+
+            $user = $this->playlist->user;
+            Mail::to($user->email)->send(new PlaylistReadyMail($user, $this->playlist));
         } catch (\Exception $e) {
             Log::info("Playlist {$this->playlist->id} failed");
             Log::error($e->getMessage());
