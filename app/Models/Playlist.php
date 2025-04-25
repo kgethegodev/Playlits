@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enum\PlaylistStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Playlist extends Model
@@ -33,5 +34,10 @@ class Playlist extends Model
     public function tracks(): HasMany
     {
         return $this->hasMany(PlaylistTrack::class);
+    }
+
+    public function tags():BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class)->using(PlaylistTag::class);
     }
 }
