@@ -35,8 +35,7 @@ class PlaylistController extends Controller
         return Inertia::render('Home', [
             'platforms' => $platforms,
             'playlists' => $user->playlists()->get(),
-            'tags'      => $tags,
-            'has_code'  => session('code') !== null
+            'tags'      => $tags
         ]);
     }
 

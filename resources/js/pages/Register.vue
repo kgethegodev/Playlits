@@ -14,7 +14,7 @@ const form = useForm({
 const submit = () => {
     form.post('/auth/register', {
         onSuccess: () => {
-            window.location.href = '/spotify_auth';
+            // window.location.href = '/spotify_auth';
         }
     })
 }

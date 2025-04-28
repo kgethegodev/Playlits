@@ -20,7 +20,6 @@ import {Badge} from "@/components/ui/badge";
 
 const props = defineProps({
     playlists: Array,
-    has_code: Boolean,
     tags: Object,
 })
 
@@ -49,11 +48,6 @@ const  submit =   () => {
 }
 
 usePoll(5000)
-
-onBeforeMount(() => {
-    if (!props.has_code)
-        window.location.href = '/spotify_auth';
-})
 </script>
 
 <template>

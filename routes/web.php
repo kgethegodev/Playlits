@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PlaylistController;
 use App\Jobs\CreatePlaylist;
 use App\Models\User;
@@ -33,30 +34,12 @@ Route::get('/spotify_redirect', function (Request $request) {
     return redirect()->route('home');
 });
 
-Route::get('/auth/login', function () {
-    return Inertia::render('Login');
-})->name('login');
 
-Route::post('/auth/login', function (Request $request) {
-    $request->validate([
-        'email' => ['required', 'string', 'email', 'max:255', 'exists:users'],
-        'password' => ['required', 'string', 'min:8'],
-    ]);
+//Auth routes
+Route::get('/auth/login', [AuthController::class, 'showLogin'])->name('login');
 
-    $user = Auth::attempt($request->only('email', 'password'));
-});
+Route::post('/auth/login', [AuthController::class, 'login']);
 
-Route::get('/auth/register', function () {
-    return Inertia::render('Register');
-})->name('register');
+Route::get('/auth/register', [AuthController::class, 'showRegister'])->name('register');
 
-Route::post('/auth/register', function (Request $request) {
-    $request->validate([
-        'name' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-        'password' => ['required', 'string', 'min:8', 'confirmed'],
-    ]);
-
-    $user = User::query()->create($request->all());
-    Auth::login($user);
-});
+Route::post('/auth/register', [AuthController::class, 'register']);
