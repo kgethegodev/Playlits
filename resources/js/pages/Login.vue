@@ -5,6 +5,7 @@ import {Link, useForm} from "@inertiajs/vue3";
 import {Button} from "@/components/ui/button/index.js";
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-vue-next'
+import {computed} from "vue";
 
 const props = defineProps({
     errors: {}
@@ -22,6 +23,8 @@ const submit = () => {
         }
     })
 }
+
+const disabled = computed(() => Object.keys(form.data()).some(key => form[key] === '') || form.processing)
 </script>
 
 <template>
@@ -49,7 +52,7 @@ const submit = () => {
                 </div>
 
                 <div class="w-full">
-                    <Button class="w-full">Login</Button>
+                    <Button class="w-full" :disabled>Login</Button>
                     <p class="text-sm text-center font-medium mt-2">New here? <Link href="/auth/register" class="italic text-blue-600">Create an account</Link> to get started.</p>
                 </div>
             </form>

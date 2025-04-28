@@ -3,6 +3,7 @@ import {Button} from "@/components/ui/button/index.js";
 import {Label} from "@/components/ui/label/index.js";
 import {Input} from "@/components/ui/input/index.js";
 import {Link, useForm} from "@inertiajs/vue3";
+import {computed} from "vue";
 
 const form = useForm({
     name: '',
@@ -17,6 +18,8 @@ const submit = () => {
         }
     })
 }
+
+const disabled = computed(() => Object.keys(form.data()).some(key => form[key] === '') || form.processing)
 </script>
 
 <template>
