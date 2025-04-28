@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('playlist_tags', function (Blueprint $table) {
+        Schema::create('playlist_tag', function (Blueprint $table) {
             $table->foreignId('playlist_id')->constrained();
             $table->foreignId('tag_id')->constrained();
+            $table->timestamps();
         });
     }
 
@@ -22,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('playlist_tags');
+        Schema::dropIfExists('playlist_tag');
     }
 };
