@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
-Route::get('/', [PlaylistController::class, 'index'])->name('home')->middleware('auth');
+Route::get('/', function () {
+    return Inertia::render('Home');
+})->name('home')->middleware('auth');
 
 Route::get('/playlists', [PlaylistController::class, 'playlists'])->name('playlists')->middleware('auth');
 

@@ -18,7 +18,7 @@ class AuthController extends Controller
      */
     public function showLogin(): Response
     {
-        return Inertia::render('Login');
+        return Inertia::render('Auth/Login');
     }
 
     /**
@@ -47,7 +47,7 @@ class AuthController extends Controller
      */
     public function showRegister(): Response
     {
-        return Inertia::render('Register');
+        return Inertia::render('Auth/Register');
     }
 
     /**

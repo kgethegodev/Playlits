@@ -3,7 +3,7 @@ import {Label} from "@/components/ui/label/index.js";
 import {Input} from "@/components/ui/input/index.js";
 import {Link, useForm} from "@inertiajs/vue3";
 import {Button} from "@/components/ui/button/index.js";
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert/index.js'
 import { AlertCircle } from 'lucide-vue-next'
 import {computed} from "vue";
 
