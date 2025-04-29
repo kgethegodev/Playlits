@@ -2,18 +2,18 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PlaylistController;
-use App\Jobs\CreatePlaylist;
-use App\Models\User;
-use App\Services\Platforms\SpotifyService;
+use App\Models\Playlist;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Home');
-})->name('home')->middleware('auth');
+
+    return Inertia::render('Home', [
+        'playlists' => Playlist::query()->with('tags')->get(),
+    ]);
+})->name('home');
 
 Route::get('/playlists', [PlaylistController::class, 'playlists'])->name('playlists')->middleware('auth');
 

@@ -997,6 +997,11 @@ lucide-vue-next@^0.487.0:
   resolved "https://registry.npmjs.org/lucide-vue-next/-/lucide-vue-next-0.487.0.tgz"
   integrity sha512-ilVgu9EHkfId7WSjmoPkzp13cuzpSGO5J16AmltjRHFoj6MlCBGY8BzsBU/ISKVlDheUxM+MsIYjNo/1hSEa6w==
 
+lucide-vue@^0.503.0:
+  version "0.503.0"
+  resolved "https://registry.yarnpkg.com/lucide-vue/-/lucide-vue-0.503.0.tgz#3c6195ed09b30a75f9a9f1688ff6d0130fc45f4b"
+  integrity sha512-W6nKu7dTjoBmg8BoqgUzhQoysgBTZWNzfP5DyUTdpNOhr5sXelkVHlOBBDM0Xx66dkyQ29j636VT0d36CU4L/g==
+
 magic-string@^0.30.11:
   version "0.30.17"
   resolved "https://registry.npmjs.org/magic-string/-/magic-string-0.30.17.tgz"
