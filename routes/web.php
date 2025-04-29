@@ -10,14 +10,16 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
 
-    return Inertia::render('Home', [
-        'playlists' => Playlist::query()->with('tags')->get(),
-    ]);
+    return Inertia::render('Home');
 })->name('home');
+
+// Playlists
+Route::get('/playlist/add', [PlaylistController::class, 'create'])->name('playlists.add')->middleware('auth');
 
 Route::get('/playlists', [PlaylistController::class, 'playlists'])->name('playlists')->middleware('auth');
 
 Route::get('/playlists/{playlist}', [PlaylistController::class, 'playlist'])->name('playlist')->middleware('auth');
+Route::post('/playlists/{playlist}/action', [PlaylistController::class, 'makeAction'])->name('playlist.action')->middleware('auth');
 
 Route::post('convert', [PlaylistController::class, 'convert'])->name('convert');
 
@@ -41,6 +43,8 @@ Route::get('/spotify_redirect', function (Request $request) {
 Route::get('/auth/login', [AuthController::class, 'showLogin'])->name('login');
 
 Route::post('/auth/login', [AuthController::class, 'login']);
+
+Route::post('/auth/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/auth/register', [AuthController::class, 'showRegister'])->name('register');
 

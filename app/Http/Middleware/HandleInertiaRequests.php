@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Playlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
@@ -36,8 +37,23 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $playlists = Playlist::query()
+            ->where('status', 'complete')
+            ->with(['tags', 'actions'])
+            ->get();
+
+        $playlists->map(function (Playlist $playlist) {
+            $track = $playlist->tracks()->where('status', 'found')->first();
+            if ($track && isset($track->meta['album']['images'][0]['url'])) {
+                $playlist->cover = $track->meta['album']['images'][0]['url'];
+            } else {
+                $playlist->cover = null; // Optional: handle case when there's no cover
+            }
+            return $playlist;
+        });
         return array_merge(parent::share($request), [
-            'auth' => Auth::user()
+            'auth' => Auth::user(),
+            'playlists' => $playlists
         ]);
     }
 }

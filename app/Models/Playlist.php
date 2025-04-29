@@ -40,4 +40,9 @@ class Playlist extends Model
     {
         return $this->belongsToMany(Tag::class)->using(PlaylistTag::class);
     }
+
+    public function actions(): HasMany
+    {
+        return $this->hasMany(PlaylistAction::class);
+    }
 }

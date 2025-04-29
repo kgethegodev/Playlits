@@ -2,10 +2,13 @@
 
 import AppLayout from "@/layouts/AppLayout.vue";
 import PlaylistCard from "@/components/PlaylistCard.vue";
+import {usePoll} from "@inertiajs/vue3";
 
 const props = defineProps({
     playlists: Array
 })
+
+usePoll(5000)
 </script>
 
 <template>
@@ -19,8 +22,9 @@ const props = defineProps({
                 </div>
             </div>
         </div>
-
-        <PlaylistCard v-for="playlist in playlists" :playlist/>
+        <div class="flex flex-col gap-4 w-full">
+            <PlaylistCard v-for="playlist in playlists" :playlist/>
+        </div>
     </app-layout>
 </template>
 

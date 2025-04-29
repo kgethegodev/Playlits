@@ -58,4 +58,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(SpotifyAccessToken::class);
     }
+
+    public function actions(): HasMany
+    {
+        return $this->hasMany(PlaylistAction::class);
+    }
 }

@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\PlaylistActionType;
 use App\Jobs\AddPlaylist;
-use App\Jobs\CreatePlaylist;
 use App\Models\Playlist;
+use App\Models\PlaylistAction;
 use App\Models\Tag;
 use App\Rules\PlaylistLinkValidation;
 use Illuminate\Database\Query\Builder;
@@ -12,12 +13,13 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PlaylistController extends Controller
 {
-    public function index(): Response
+    public function create(): Response
     {
         $user = Auth::user();
         $tags = Tag::all()->groupBy('type');
@@ -32,7 +34,7 @@ class PlaylistController extends Controller
             ]
         ];
 
-        return Inertia::render('Home', [
+        return Inertia::render('Playlist/Create', [
             'platforms' => $platforms,
             'playlists' => $user->playlists()->get(),
             'tags'      => $tags
@@ -83,16 +85,37 @@ class PlaylistController extends Controller
 
     public function playlist(Playlist $playlist): Response|RedirectResponse
     {
-        $user = Auth::user();
-        if ($playlist->user_id !== $user->id) {
-            return back()->withErrors([
-                'message' => 'You are not allowed to play this playlist',
+        return Inertia::render('Playlist/Index', [
+            'playlist' => $playlist->load(['tracks']),
+        ]);
+    }
+
+    /**
+     * Apply action to playlist
+     *
+     * @param Playlist $playlist
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function makeAction(Playlist $playlist, Request $request): RedirectResponse
+    {
+        $request->validate([
+            'type' => ['required', new Enum(PlaylistActionType::class)],
+            'meta.message' => ['required_if:type,comment', 'string'],
+        ]);
+
+        $action = $playlist->actions()->where(['type' => 'like', 'user_id' => Auth::id()]);
+
+        if($request->input('type') === 'like' && $action->exists()) {
+            $action->delete();
+        } else {
+            $playlist->actions()->create([
+                'type'  => $request->input('type'),
+                'meta'  => $request->input('meta') ?? null,
+                'user_id' => Auth::id(),
             ]);
         }
 
-        return Inertia::render('Playlist', [
-            'playlists' => $user->playlists()->get(),
-            'playlist' => $playlist->load(['tracks']),
-        ]);
+        return redirect()->back();
     }
 }

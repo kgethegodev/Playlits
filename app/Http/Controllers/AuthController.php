@@ -35,9 +35,20 @@ class AuthController extends Controller
         ]);
 
         if(Auth::attempt($request->only('email', 'password')))
-            return redirect()->route('home');
+            return redirect()->intended(route('home'));
 
         return redirect()->back()->withErrors(['message' => 'Failed to login.']);
+    }
+
+    /**
+     * Logout
+     *
+     * @return RedirectResponse
+     */
+    public function logout(): RedirectResponse
+    {
+        Auth::logout();
+        return redirect()->back();
     }
 
     /**

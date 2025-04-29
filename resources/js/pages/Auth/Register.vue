@@ -52,7 +52,7 @@ const disabled = computed(() => Object.keys(form.data()).some(key => form[key] =
                 </div>
                 <div class="w-full">
                     <Button :disabled class="w-full">Register</Button>
-                    <p class="text-sm text-center font-medium mt-2">Welcome back! <Link href="/auth/register" class="italic text-blue-600">Sign in to your account</Link>.</p>
+                    <p class="text-sm text-center font-medium mt-2">Welcome back! <Link href="/auth/login" class="italic text-blue-600">Sign in to your account</Link>.</p>
                 </div>
             </form>
         </div>
