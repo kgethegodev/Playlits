@@ -15,9 +15,9 @@ class PlaylistLinkValidation implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (
-            !$this->isSpotifyPlaylist($value) &&
-            !$this->isAppleMusicPlaylist($value) &&
-            !$this->isYouTubeMusicPlaylist($value)
+//            !$this->isSpotifyPlaylist($value) &&
+            !$this->isAppleMusicPlaylist($value)
+//            !$this->isYouTubeMusicPlaylist($value)
         ) {
             $fail('The :attribute must be a valid Spotify, Apple Music, or YouTube Music playlist link.');
         }
