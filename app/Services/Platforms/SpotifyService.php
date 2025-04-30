@@ -174,6 +174,7 @@ class SpotifyService implements PlatfromInterface
             ]);
 
             if (!$response->successful()) {
+                info("We failed niggas shit");
                 throw new ConnectionException();
             }
 

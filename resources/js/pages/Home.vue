@@ -13,7 +13,7 @@ usePoll(5000)
 
 <template>
     <app-layout>
-        <div class="home-banner rounded-2xl h-25 w-full mb-10 overflow-hidden relative text-white">
+        <div class="home-banner rounded-2xl h-50 w-full mb-10 overflow-hidden relative text-white">
             <img src="http://playlits.test/images/pexels-theshuttervision-15447298.jpg" class="object-cover w-full h-full absolute left-1/2 top-1/2 translate-[-50%]" alt="home-banner">
             <div class="h-full w-full flex flex-col justify-center z-10 relative px-4 gap-2">
                 <div class="flex flex-col">
@@ -22,7 +22,7 @@ usePoll(5000)
                 </div>
             </div>
         </div>
-        <div class="flex flex-col gap-4 w-full">
+        <div class="grid sm:grid-cols-2 gap-4 w-full">
             <PlaylistCard v-for="playlist in playlists" :playlist/>
         </div>
     </app-layout>

@@ -30,7 +30,11 @@ class PlaylistLinkValidation implements ValidationRule
 
     private function isAppleMusicPlaylist(string $url): bool
     {
-        return (bool) preg_match('/^https:\/\/music\.apple\.com\/[a-z]{2}\/playlist\/[^\/]+\/pl\.[a-zA-Z0-9]+$/', $url);
+        return (bool) preg_match(
+            '/^(https:\/\/music\.apple\.com\/[a-z]{2}\/playlist\/[^\/]+\/pl\.[a-zA-Z0-9_-]+|https:\/\/open\.spotify\.com\/playlist\/[a-zA-Z0-9]+)$/',
+            $url
+        );
+
     }
 
     private function isYouTubeMusicPlaylist(string $url): bool

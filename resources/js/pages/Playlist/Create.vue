@@ -52,10 +52,10 @@ usePoll(5000)
 
 <template>
     <app-layout :playlists>
-        <div class="flex flex-col gap-[1rem] w-full">
+        <div class="flex flex-col gap-[1rem] w-full max-w-lg">
             <Card>
                     <CardHeader>
-                        <CardTitle class="text-xl">add playlist.</CardTitle>
+                        <CardTitle class="text-xl font-bold">add playlist.</CardTitle>
                         <CardDescription>paste your playlist, describe it, and we'll handle the rest.</CardDescription>
                     </CardHeader>
                     <CardContent class="flex flex-col gap-6">

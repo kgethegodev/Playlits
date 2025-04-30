@@ -86,7 +86,7 @@ class PlaylistController extends Controller
     public function playlist(Playlist $playlist): Response|RedirectResponse
     {
         return Inertia::render('Playlist/Index', [
-            'playlist' => $playlist->load(['tracks']),
+            'playlist' => $playlist->load(['tracks', 'actions', 'actions.user']),
         ]);
     }
 
@@ -95,9 +95,8 @@ class PlaylistController extends Controller
      *
      * @param Playlist $playlist
      * @param Request $request
-     * @return RedirectResponse
      */
-    public function makeAction(Playlist $playlist, Request $request): RedirectResponse
+    public function makeAction(Playlist $playlist, Request $request)
     {
         $request->validate([
             'type' => ['required', new Enum(PlaylistActionType::class)],
@@ -115,7 +114,5 @@ class PlaylistController extends Controller
                 'user_id' => Auth::id(),
             ]);
         }
-
-        return redirect()->back();
     }
 }
