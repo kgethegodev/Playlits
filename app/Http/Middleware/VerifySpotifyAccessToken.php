@@ -24,7 +24,8 @@ class VerifySpotifyAccessToken
             $user = Auth::user();
             $access_token = $user->spotifyAccessToken ?? null;
             if (!$access_token) {
-                if ($request->route()->getName() !== 'spotify_redirect') {
+
+                if (!in_array($request->route()->getName(), ['spotify_redirect', 'login', 'register'])) {
                     $state = Str::random();
                     $scope = 'user-read-private user-read-email playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public';
                     $client_id = config('services.spotify.client_id');
