@@ -22,6 +22,7 @@ const props = defineProps({
 })
 const likes = computed(() => props.playlist.actions.filter(action => action.type === 'like' ?? []))
 const comments =  computed(() => props.playlist.actions.filter(action => action.type === 'comment' ?? []))
+const downloads =  computed(() => props.playlist.actions.filter(action => action.type === 'download' ?? []))
 const has_liked = computed(() => {
     const auth = usePage().props.auth ?? null
 
@@ -32,6 +33,12 @@ const has_commented = computed(() => {
 
     return auth && comments.value.some(comment => comment.user_id === auth.id)
 })
+const has_downloaded = computed(() => {
+    const auth = usePage().props.auth ?? null
+
+    return auth && downloads.value.some(download => download.user_id === auth.id)
+})
+
 const clearComment = () => {
     comment.value = ""
     open_dialog.value = false
@@ -54,9 +61,9 @@ const clearComment = () => {
                             <Flame :size="15" class="transition-all group-hover:stroke-orange-500" :class="has_liked ? 'fill-orange-500 stroke-orange-500 ' : ''"/>
                             <p class="text-xs transition-all group-hover:text-orange-500" :class="has_liked ? 'text-orange-500 ' : ''">{{ likes.length }}</p>
                         </Link>
-                        <Link href="#" class="flex gap-0.5 group">
-                            <AudioWaveform :size="15" class="transition-all group-hover:stroke-green-500"/>
-                            <p class="text-xs transition-all group-hover:text-green-500">0</p>
+                        <Link :href="`/playlists/${playlist.id}/action`" method="post" :data="{type: 'download'}" class="flex gap-0.5 group cursor-pointer">
+                            <AudioWaveform :size="15" class="transition-all group-hover:stroke-green-500" :class="has_downloaded ? 'stroke-green-500 ' : ''"/>
+                            <p class="text-xs transition-all group-hover:text-green-500" :class="has_downloaded ? 'text-green-500 ' : ''">{{downloads.length}}</p>
                         </Link>
                         <Dialog v-model:open="open_dialog">
                             <DialogTrigger class="flex gap-0.5 group cursor-pointer" @click="() => {open_dialog = true}">

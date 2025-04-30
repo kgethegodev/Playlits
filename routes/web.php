@@ -3,7 +3,9 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PlaylistController;
 use App\Models\Playlist;
+use App\Services\Platforms\SpotifyService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -33,10 +35,20 @@ Route::get('/spotify_auth', function (){
 })->name('spotify_auth');
 
 Route::get('/spotify_redirect', function (Request $request) {
-    session()->put('code', $request->get('code'));
+    if (Auth::check()) {
+        $user = Auth::user();
+        $token = SpotifyService::createAuthAccessToken($request->get('code'));
+        $user->spotifyAccessToken()->create([
+            'token'  => $token['access_token'],
+            'refresh_token' => $token['refresh_token'],
+            'expires_at'    => now()->addMinutes($token['expires_in']),
+        ]);
+    } else {
+        session()->put('code', $request->get('code'));
+    }
 
     return redirect()->route('home');
-});
+})->name('spotify_redirect');
 
 
 //Auth routes

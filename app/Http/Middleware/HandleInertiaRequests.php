@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Playlist;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
@@ -37,6 +38,17 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        return array_merge(parent::share($request), [
+            'auth' => Auth::user(),
+            'playlists' => $this->preparePlaylists()
+        ]);
+    }
+
+    /**
+     * @return Collection
+     */
+    private  function preparePlaylists(): Collection
+    {
         $playlists = Playlist::query()
             ->where('status', 'complete')
             ->with(['tags', 'actions'])
@@ -51,9 +63,7 @@ class HandleInertiaRequests extends Middleware
             }
             return $playlist;
         });
-        return array_merge(parent::share($request), [
-            'auth' => Auth::user(),
-            'playlists' => $playlists
-        ]);
+
+        return $playlists;
     }
 }

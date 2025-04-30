@@ -2,7 +2,7 @@
 
 import AppLayout from "@/layouts/AppLayout.vue";
 import PlaylistCard from "@/components/PlaylistCard.vue";
-import {usePoll} from "@inertiajs/vue3";
+import {Head, usePoll} from "@inertiajs/vue3";
 
 const props = defineProps({
     playlists: Array
@@ -12,6 +12,7 @@ usePoll(5000)
 </script>
 
 <template>
+    <Head title="Welcome to playlits." />
     <app-layout>
         <div class="home-banner rounded-2xl h-50 w-full mb-10 overflow-hidden relative text-white">
             <img src="http://playlits.test/images/pexels-theshuttervision-15447298.jpg" class="object-cover w-full h-full absolute left-1/2 top-1/2 translate-[-50%]" alt="home-banner">

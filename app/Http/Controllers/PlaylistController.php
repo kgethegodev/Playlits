@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enum\PlaylistActionType;
 use App\Jobs\AddPlaylist;
+use App\Jobs\AddSongsToPlaylist;
 use App\Models\Playlist;
 use App\Models\PlaylistAction;
 use App\Models\Tag;
@@ -108,11 +109,15 @@ class PlaylistController extends Controller
         if($request->input('type') === 'like' && $action->exists()) {
             $action->delete();
         } else {
-            $playlist->actions()->create([
+            $action = $playlist->actions()->create([
                 'type'  => $request->input('type'),
                 'meta'  => $request->input('meta') ?? null,
                 'user_id' => Auth::id(),
             ]);
+
+            if ($request->input('type') === 'download') {
+                AddSongsToPlaylist::dispatch($playlist, Auth::user(), $action);
+            }
         }
     }
 }
