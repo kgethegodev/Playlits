@@ -12,7 +12,7 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
 
-    return Inertia::render('Home');
+    return Inertia::render('Home', ['banner'    => asset('images/pexels-theshuttervision-15447298.jpg'),]);
 })->name('home');
 
 // Playlists
