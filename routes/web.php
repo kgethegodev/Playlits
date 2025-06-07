@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    $playlists = Playlist::query()->where('status', 'complete')->with(['actions'])->get();
+    $playlists = Playlist::query()->where('status', 'complete')->with(['actions', 'tags'])->get();
     return Inertia::render('Home', [
         'banner'    => asset('images/pexels-theshuttervision-15447298.jpg'),
         'playlists' => $playlists,
