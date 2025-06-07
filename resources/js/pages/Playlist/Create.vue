@@ -51,7 +51,7 @@ usePoll(5000)
 </script>
 
 <template>
-    <app-layout :playlists>
+    <app-layout>
         <div class="flex flex-col gap-[1rem] w-full max-w-lg">
             <Card>
                     <CardHeader>
@@ -122,7 +122,7 @@ usePoll(5000)
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button :disabled class="w-full" @click.prevent="submit">convert.</Button>
+                        <Button :disabled="disabled" class="w-full" @click.prevent="submit">convert.</Button>
                     </CardFooter>
                 </Card>
         </div>

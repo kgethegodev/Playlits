@@ -11,8 +11,11 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-
-    return Inertia::render('Home', ['banner'    => asset('images/pexels-theshuttervision-15447298.jpg'),]);
+    $playlists = Playlist::query()->where('status', 'complete')->with(['actions'])->get();
+    return Inertia::render('Home', [
+        'banner'    => asset('images/pexels-theshuttervision-15447298.jpg'),
+        'playlists' => $playlists,
+    ]);
 })->name('home');
 
 // Playlists
@@ -20,7 +23,7 @@ Route::get('/playlist/add', [PlaylistController::class, 'create'])->name('playli
 
 Route::get('/playlists', [PlaylistController::class, 'playlists'])->name('playlists')->middleware('auth');
 
-Route::get('/playlists/{playlist}', [PlaylistController::class, 'playlist'])->name('playlist')->middleware('auth');
+Route::get('/playlists/{playlist}', [PlaylistController::class, 'playlist'])->name('playlist');
 Route::post('/playlists/{playlist}/action', [PlaylistController::class, 'makeAction'])->name('playlist.action')->middleware('auth');
 
 Route::post('convert', [PlaylistController::class, 'convert'])->name('convert');

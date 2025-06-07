@@ -11,7 +11,7 @@ usePoll(5000)
 </script>
 
 <template>
-    <app-layout :playlists>
+    <app-layout>
         <div class="flex flex-col gap-[1rem] w-full">
             <Link :href="`/playlists/${playlist.id}`" v-for="playlist in playlists">
                 <Card class="cursor-pointer transition-shadow hover:shadow-md">

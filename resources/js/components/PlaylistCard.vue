@@ -1,7 +1,7 @@
 <script setup>
 import {Card} from "@/components/ui/card/index.js";
 import {Badge} from "@/components/ui/badge/index.js";
-import { Download, MessageCircle, Flame, AudioWaveform } from 'lucide-vue-next';
+import { MessageCircle, Flame, AudioWaveform } from 'lucide-vue-next';
 import {Link, usePage} from "@inertiajs/vue3";
 import {computed, ref} from "vue";
 import {
@@ -57,11 +57,11 @@ const clearComment = () => {
                     <Link class="transition-all font-bold hover:text-blue-500" :href="`/playlists/${playlist.id}`">{{ playlist.name }}</Link>
 
                     <div class="flex gap-4 items-center">
-                        <Link :href="`/playlists/${playlist.id}/action`" method="post" :data="{type: 'like'}" preserve-state class="flex gap-0.5 group cursor-pointer">
+                        <Link :href="`/playlists/${playlist.id}/action`" method="post" :data="{type: 'like'}" preserve-state preserve-scroll class="flex gap-0.5 group cursor-pointer">
                             <Flame :size="15" class="transition-all group-hover:stroke-orange-500" :class="has_liked ? 'fill-orange-500 stroke-orange-500 ' : ''"/>
                             <p class="text-xs transition-all group-hover:text-orange-500" :class="has_liked ? 'text-orange-500 ' : ''">{{ likes.length }}</p>
                         </Link>
-                        <Link :href="`/playlists/${playlist.id}/action`" method="post" :data="{type: 'download'}" class="flex gap-0.5 group cursor-pointer">
+                        <Link :href="`/playlists/${playlist.id}/action`" method="post" :data="{type: 'download'}" preserve-state preserve-scroll class="flex gap-0.5 group cursor-pointer">
                             <AudioWaveform :size="15" class="transition-all group-hover:stroke-green-500" :class="has_downloaded ? 'stroke-green-500 ' : ''"/>
                             <p class="text-xs transition-all group-hover:text-green-500" :class="has_downloaded ? 'text-green-500 ' : ''">{{downloads.length}}</p>
                         </Link>
@@ -73,10 +73,10 @@ const clearComment = () => {
 
                             <DialogContent>
                                 <DialogHeader>
-                                    <DialogTitle>Comment Nigga</DialogTitle>
-                                    <DialogDescription>Leave your thoughts about the playlist.</DialogDescription>
+                                    <DialogTitle class="text-left">comment here.</DialogTitle>
+                                    <DialogDescription class="text-left text-xs">leave your thoughts about the playlist.</DialogDescription>
                                 </DialogHeader>
-                                    <Textarea v-model="comment" placeholder="Leave your comment here."/>
+                                    <Textarea class="text-xs" v-model="comment" placeholder="....."/>
                                 <DialogFooter>
                                     <Link class="w-full"
                                           :href="`/playlists/${playlist.id}/action`"

@@ -6,7 +6,6 @@ use App\Enum\PlaylistActionType;
 use App\Jobs\AddPlaylist;
 use App\Jobs\AddSongsToPlaylist;
 use App\Models\Playlist;
-use App\Models\PlaylistAction;
 use App\Models\Tag;
 use App\Rules\PlaylistLinkValidation;
 use Illuminate\Database\Query\Builder;

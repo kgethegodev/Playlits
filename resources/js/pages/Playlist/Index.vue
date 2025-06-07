@@ -12,7 +12,7 @@ const comments = computed(() => props.playlist.actions.filter(action => action.t
 </script>
 
 <template>
-<app-layout :playlists>
+<app-layout>
     <div class="flex flex-col gap-[1rem] w-full">
         <p class="text-xl font-medium">{{playlist.name}}</p>
 

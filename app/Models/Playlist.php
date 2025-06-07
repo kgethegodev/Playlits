@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enum\PlaylistStatus;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Playlist extends Model
 {
+    protected $appends = ['cover'];
     protected $fillable = [
         'user_id',
         'name',
@@ -44,5 +46,15 @@ class Playlist extends Model
     public function actions(): HasMany
     {
         return $this->hasMany(PlaylistAction::class);
+    }
+
+    protected function cover(): Attribute
+    {
+        return Attribute::make(
+            get: function (){
+                $track = $this->tracks()->firstWhere('status', 'found');
+                return $track?->meta['album']['images'][0]['url'] ?? null;
+            }
+        );
     }
 }

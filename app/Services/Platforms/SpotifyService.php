@@ -81,7 +81,64 @@ class SpotifyService implements PlatfromInterface
 
     public static function getTracks(string $url): array
     {
-        return  [];
+        $tracks = [];
+        try {
+            // Obtain client credentials access token
+            if (!Cache::has('spotify_client_access_token')) {
+                $tokenResponse = Http::asForm()->post('https://accounts.spotify.com/api/token', [
+                    'grant_type'    => 'client_credentials',
+                    'client_id'     => config('services.spotify.client_id'),
+                    'client_secret' => config('services.spotify.client_secret'),
+                ]);
+                if (!$tokenResponse->successful()) {
+                    throw new ConnectionException('Failed to authenticate with Spotify API.');
+                }
+                Cache::put('spotify_client_access_token', $tokenResponse->json('access_token'), $tokenResponse->json('expires_in'));
+            }
+            $accessToken = Cache::get('spotify_client_access_token');
+
+            // Parse playlist ID from URL
+            $path = parse_url($url, PHP_URL_PATH);
+            $segments = explode('/', trim($path, '/'));
+            if (!isset($segments[1])) {
+                throw new \InvalidArgumentException("Invalid Spotify playlist URL: {$url}");
+            }
+            $playlistId = $segments[1];
+
+            // Fetch tracks in pages
+            $next = "https://api.spotify.com/v1/playlists/{$playlistId}/tracks?limit=100";
+            while ($next) {
+                $response = Http::withToken($accessToken)->get($next);
+                if (!$response->successful()) {
+                    throw new ConnectionException('Failed to retrieve Spotify playlist tracks.');
+                }
+                $data = $response->json();
+                foreach ($data['items'] ?? [] as $item) {
+                    if (empty($item['track'])) {
+                        continue;
+                    }
+                    $t = $item['track'];
+                    $name = $t['name'] ?? '';
+                    $artistName = isset($t['artists'][0]['name']) ? $t['artists'][0]['name'] : '';
+                    $durationMs = $t['duration_ms'] ?? 0;
+                    $totalSeconds = (int) ($durationMs / 1000);
+                    $hours = floor($totalSeconds / 3600);
+                    $minutes = floor(($totalSeconds % 3600) / 60);
+                    $seconds = $totalSeconds % 60;
+                    $duration = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+                    $tracks[] = [
+                        'name'     => $name,
+                        'artist'   => $artistName,
+                        'duration' => $duration,
+                    ];
+                }
+                $next = $data['next'];
+            }
+        } catch (\Exception $e) {
+            // Log error and return what has been collected (possibly empty)
+            info("SpotifyService::getTracks error for URL {$url}: {$e->getMessage()}");
+        }
+        return $tracks;
     }
 
     public static function addTracks(string $access_token, string $playlist_id, array $uri_array)
