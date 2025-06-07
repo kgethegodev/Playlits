@@ -7,8 +7,8 @@ use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
 class VerifySpotifyAccessToken
@@ -31,7 +31,21 @@ class VerifySpotifyAccessToken
                     $client_id = config('services.spotify.client_id');
                     $redirect_uri = config('services.spotify.redirect_url');
 
-                    return redirect("https://accounts.spotify.com/authorize?response_type=code&client_id={$client_id}&scope={$scope}&redirect_uri={$redirect_uri}&state={$state}");
+                    $authUrl = "https://accounts.spotify.com/authorize?" . http_build_query([
+                            'response_type' => 'code',
+                            'client_id'     => $client_id,
+                            'scope'         => $scope,
+                            'redirect_uri'  => $redirect_uri,
+                            'state'         => $state,
+                        ]);
+
+                    // ✅ If it's an Inertia request (AJAX), do a full client-side redirect
+                    if ($request->header('X-Inertia') || $request->expectsJson() || $request->ajax()) {
+                        return Inertia::location($authUrl);
+                    }
+
+                    // ✅ Otherwise, do a normal server-side redirect
+                    return redirect($authUrl);
                 }
             } else {
                 if(Carbon::parse($access_token->expires_at) < Carbon::now()) {
