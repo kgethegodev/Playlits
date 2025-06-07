@@ -33,7 +33,7 @@ const form = useForm({
 
 const disabled = computed(() => Object.keys(form.data()).some(key => form[key] === '') || form.processing)
 
-const  submit =   () => {
+const  submit = () => {
     form.post('/convert', {
         onSuccess: () => {
             form.reset()

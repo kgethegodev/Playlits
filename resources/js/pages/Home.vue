@@ -3,13 +3,25 @@
 import AppLayout from "@/layouts/AppLayout.vue";
 import PlaylistCard from "@/components/PlaylistCard.vue";
 import {Head, usePoll} from "@inertiajs/vue3";
+import {onMounted} from "vue";
+import { toast } from 'vue-sonner'
+import { Toaster } from '@/components/ui/sonner'
 
 const props = defineProps({
     playlists: Array,
-    banner: String
+    banner: String,
+    status: Array | null
 })
 
 usePoll(5000)
+
+onMounted(() => {
+    if(props.status) {
+        toast('Your playlist is being converted.', {
+            description: "You'll receive a notification once it is ready.",
+        })
+    }
+})
 </script>
 
 <template>
@@ -28,6 +40,7 @@ usePoll(5000)
             <PlaylistCard v-for="playlist in playlists" :playlist/>
         </div>
     </app-layout>
+    <Toaster />
 </template>
 
 <style scoped lang="scss">

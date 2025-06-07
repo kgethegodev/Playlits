@@ -71,7 +71,9 @@ class PlaylistController extends Controller
         }
         AddPlaylist::dispatch($request->input('playlist_name'), $request->input('playlist_link'), $platform, $tags, Auth::user());
 
-        return to_route('home');
+        return to_route('home')->with(['status' =>
+            ['success' => true, 'message' => 'Your playlist is being converted.', 'description'  => 'You\'ll receive a notification once it is ready.']
+        ]);
     }
 
     public function playlists(): Response
